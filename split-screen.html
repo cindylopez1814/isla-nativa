@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Code + MCP Figma · Split Screen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --mono:   'JetBrains Mono', 'Fira Code', monospace;
+      --sans:   'Inter', system-ui, sans-serif;
+      --teal:   #2dd4bf;
+      --purple: #a78bfa;
+      --blue:   #0ea5e9;
+      --green:  #3fb950;
+      --coral:  #e58a72;
+      --orange: #ffa657;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: #020407;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    /* ── Wrapper ── */
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* ── Caption top ── */
+    .caption {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.28);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .caption em { color: var(--teal); font-style: normal; font-weight: 600; }
+
+    /* ════════════════════════════════════════
+       SPLIT SCREEN CONTAINER
+    ════════════════════════════════════════ */
+    .split-screen {
+      border: 1px solid rgba(45,212,191,0.16);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #090e15;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.6),
+        0 40px 100px rgba(0,0,0,0.7),
+        0 0 60px rgba(45,212,191,0.04);
+    }
+
+    /* ── Window title bar ── */
+    .titlebar {
+      height: 40px;
+      background: #111823;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .titlebar__dots { display: flex; gap: 7px; }
+    .dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .dot--r { background: #ff5f57; }
+    .dot--y { background: #febc2e; }
+    .dot--g { background: #28c840; }
+    .titlebar__center {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--sans);
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .titlebar__center strong { color: rgba(255,255,255,0.65); font-weight: 600; }
+    .titlebar__badge {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--teal);
+      background: rgba(45,212,191,0.1);
+      border: 1px solid rgba(45,212,191,0.22);
+      border-radius: 20px;
+      padding: 3px 11px;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .titlebar__badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 6px var(--teal);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    /* ── Split body ── */
+    .split-body {
+      display: flex;
+      height: 562px;
+    }
+
+    /* ════════════════════════════════════════
+       SHARED PANE STYLES
+    ════════════════════════════════════════ */
+    .pane {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .pane__bar {
+      height: 34px;
+      background: #0f1924;
+      border-bottom: 1px solid rgba(255,255,255,0.055);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+    .pane__bar-icon {
+      width: 15px; height: 15px;
+      color: rgba(255,255,255,0.35);
+      flex-shrink: 0;
+    }
+    .pane__bar-label {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.2px;
+    }
+    .pane__bar-label strong { color: rgba(255,255,255,0.68); font-weight: 600; }
+    .pane__bar-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--sans);
+      font-size: 10px;
+      color: rgba(255,255,255,0.28);
+    }
+    .pane__bar-status .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 5px rgba(63,185,80,0.7);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* ════════════════════════════════════════
+       LEFT: TERMINAL
+    ════════════════════════════════════════ */
+    .pane--terminal { background: #0d1117; }
+    .pane--terminal .pane__bar { background: #161b22; }
+
+    .terminal-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 18px 18px 18px 18px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.8;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.08) transparent;
+    }
+    .terminal-body::-webkit-scrollbar { width: 3px; }
+    .terminal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    /* Command block with left accent */
+    .cmd-block {
+      background: rgba(255,255,255,0.025);
+      border-left: 2px solid rgba(45,212,191,0.3);
+      padding: 11px 13px;
+      border-radius: 0 5px 5px 0;
+      margin-bottom: 18px;
+      word-break: break-all;
+    }
+    .t-prompt { color: rgba(255,255,255,0.18); }
+    .t-prompt::before { content: '$ '; color: var(--teal); font-weight: 500; }
+    .t-cmd   { color: #e6edf3; }
+    .t-flag  { color: var(--teal); }
+    .t-jsx   { color: var(--orange); font-weight: 500; }
+    .t-attr  { color: var(--purple); }
+    .t-val   { color: #a5d6ff; }
+    .t-num   { color: #79c0ff; }
+    .t-angle { color: rgba(255,255,255,0.35); }
+    .ind1 { padding-left: 1.4em; display: block; }
+    .ind2 { padding-left: 2.8em; display: block; }
+    .ind3 { padding-left: 4.2em; display: block; }
+    .ind4 { padding-left: 5.6em; display: block; }
+
+    /* Output grid rows */
+    .out-section {
+      display: block;
+      color: rgba(255,255,255,0.22);
+      font-size: 10.5px;
+      letter-spacing: 0.3px;
+      margin: 14px 0 5px;
+    }
+    .out-row {
+      display: grid;
+      grid-template-columns: 16px 156px 24px 160px auto;
+      column-gap: 0;
+      align-items: baseline;
+      line-height: 1.7;
+    }
+    .out-row.tree {
+      grid-template-columns: 16px 150px 74px 82px auto;
+    }
+    .t-ok   { color: var(--green); }
+    .t-dim  { color: rgba(255,255,255,0.22); }
+    .t-name { color: #e6edf3; font-weight: 500; }
+    .t-id   { color: var(--blue); }
+    .t-hex  { color: var(--teal); }
+    .t-tok  { color: rgba(255,255,255,0.38); }
+    .t-info { color: rgba(255,255,255,0.28); font-size: 10.5px; }
+
+    /* Final lines */
+    .out-success {
+      color: var(--green);
+      margin-top: 4px;
+      display: block;
+    }
+    .t-cursor {
+      display: inline-block;
+      width: 7px; height: 13px;
+      background: var(--teal);
+      vertical-align: middle;
+      margin-left: 3px;
+      border-radius: 1px;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+    /* ════════════════════════════════════════
+       MCP DIVIDER
+    ════════════════════════════════════════ */
+    .mcp-divider {
+      width: 28px;
+      flex-shrink: 0;
+      position: relative;
+      background: #090e15;
+      border-left:  1px solid rgba(255,255,255,0.04);
+      border-right: 1px solid rgba(255,255,255,0.04);
+      overflow: visible;
+      z-index: 20;
+    }
+    /* Vertical glowing line */
+    .mcp-divider__line {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%; transform: translateX(-50%);
+      width: 1px;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(45,212,191,0.2) 8%,
+        rgba(45,212,191,0.6) 35%,
+        rgba(45,212,191,0.9) 50%,
+        rgba(45,212,191,0.6) 65%,
+        rgba(45,212,191,0.2) 92%,
+        transparent 100%
+      );
+      animation: lineBreath 3s ease-in-out infinite;
+    }
+    @keyframes lineBreath { 0%,100%{opacity:0.65;} 50%{opacity:1;} }
+
+    /* Traveling dots */
+    .mcp-divider__dot {
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 10px var(--teal), 0 0 3px var(--teal);
+      pointer-events: none;
+    }
+    .mcp-divider__dot--a { animation: dotTravel 2.6s ease-in-out infinite; }
+    .mcp-divider__dot--b { animation: dotTravel 2.6s ease-in-out infinite 1.3s; }
+    @keyframes dotTravel {
+      0%   { top: 12%; opacity: 0; }
+      6%   { opacity: 1; }
+      92%  { opacity: 0.9; }
+      100% { top: 88%; opacity: 0; }
+    }
+
+    /* Center badge */
+    .mcp-badge {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #060c13;
+      border: 1px solid rgba(45,212,191,0.38);
+      border-radius: 24px;
+      padding: 9px 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      box-shadow:
+        0 0 0 4px rgba(45,212,191,0.05),
+        0 0 24px rgba(45,212,191,0.2);
+      z-index: 5;
+    }
+    .mcp-badge__icon {
+      font-size: 13px;
+      line-height: 1;
+    }
+    .mcp-badge__label {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      font-weight: 500;
+      color: var(--teal);
+      letter-spacing: 0.8px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+    .mcp-badge__arrows {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: rgba(45,212,191,0.45);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      letter-spacing: -1px;
+    }
+
+    /* ════════════════════════════════════════
+       RIGHT: FIGMA PANE
+    ════════════════════════════════════════ */
+    .pane--figma { background: #1e1e2e; }
+    .pane--figma .pane__bar { background: #18181f; }
+
+    /* Figma secondary toolbar */
+    .figma-toolbar {
+      height: 30px;
+      background: #18181f;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .ftool {
+      width: 26px; height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.38);
+      font-family: var(--sans);
+      font-size: 11px;
+      cursor: default;
+      flex-shrink: 0;
+    }
+    .ftool--on {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.85);
+    }
+    .fsep {
+      width: 1px; height: 14px;
+      background: rgba(255,255,255,0.07);
+      margin: 0 3px; flex-shrink: 0;
+    }
+    .ftoolbar__right {
+      margin-left: auto;
+      font-family: var(--sans);
+      font-size: 10px;
+      color: rgba(255,255,255,0.28);
+      padding-right: 4px;
+    }
+
+    /* Figma inner body */
+    .figma-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── Layers panel ── */
+    .layers {
+      width: 188px;
+      flex-shrink: 0;
+      background: #18181f;
+      border-right: 1px solid rgba(255,255,255,0.05);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.07) transparent;
+    }
+    .layers::-webkit-scrollbar { width: 3px; }
+    .layers::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); }
+    .layers__header {
+      height: 26px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+    .layer-row {
+      display: flex;
+      align-items: center;
+      height: 25px;
+      padding: 0 4px;
+      border-radius: 3px;
+      margin: 0 3px;
+      cursor: default;
+      gap: 2px;
+    }
+    .layer-row:hover { background: rgba(255,255,255,0.05); }
+    .layer-row--sel { background: rgba(14,165,233,0.18) !important; }
+    .layer-row__caret {
+      width: 14px; height: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.25);
+      font-size: 8px;
+      flex-shrink: 0;
+    }
+    .layer-row__ico {
+      width: 14px; height: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .layer-row__name {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .layer-row--sel .layer-row__name { color: #e2e8f0; }
+    .layer-row--comp .layer-row__name { color: #c084fc; }
+    .layer-row--comp.layer-row--sel .layer-row__name { color: #e2e8f0; }
+
+    /* SVG icon helpers */
+    .ico-frame { stroke: rgba(255,255,255,0.4); fill: none; }
+    .ico-text  { stroke: rgba(167,139,250,0.7); fill: none; }
+    .ico-comp  { stroke: #c084fc; fill: rgba(192,132,252,0.15); }
+    .ico-inst  { stroke: #818cf8; fill: rgba(129,140,248,0.12); }
+
+    /* ── Figma Canvas ── */
+    .canvas {
+      flex: 1;
+      background-color: #2a2a3c;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+      background-size: 16px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative canvas rulers */
+    .canvas::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 16px;
+      background: rgba(255,255,255,0.03);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .canvas::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 16px;
+      background: rgba(255,255,255,0.03);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Edge fade vignette */
+    .canvas__vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(26,26,40,0.55) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Frame label (above selection) */
+    .canvas__label {
+      font-family: var(--sans);
+      font-size: 10px;
+      color: var(--blue);
+      margin-bottom: 5px;
+      letter-spacing: 0.1px;
+      align-self: flex-start;
+      padding-left: 1px;
+    }
+
+    /* Selection wrapper */
+    .canvas__selection {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      z-index: 3;
+    }
+    /* Blue selection outline */
+    .canvas__frame {
+      outline: 2px solid var(--blue);
+      position: relative;
+      display: block;
+    }
+    /* Resize handles */
+    .handle {
+      position: absolute;
+      width: 7px; height: 7px;
+      background: #fff;
+      border: 1.5px solid var(--blue);
+      border-radius: 1.5px;
+      z-index: 10;
+    }
+    .h-tl { top: -4px; left: -4px; }
+    .h-tr { top: -4px; right: -4px; }
+    .h-bl { bottom: -4px; left: -4px; }
+    .h-br { bottom: -4px; right: -4px; }
+    .h-tm { top: -4px; left: calc(50% - 3.5px); }
+    .h-bm { bottom: -4px; left: calc(50% - 3.5px); }
+    .h-ml { left: -4px; top: calc(50% - 3.5px); }
+    .h-mr { right: -4px; top: calc(50% - 3.5px); }
+    /* Dimension badge */
+    .canvas__dims {
+      position: absolute;
+      right: -72px;
+      top: 0;
+      font-family: var(--sans);
+      font-size: 10px;
+      color: var(--blue);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /*
+      ════════════════════════════════════════
+      COMPONENT IMAGE
+      Reemplaza src="" con tu screenshot.
+      ════════════════════════════════════════
+    */
+    .component-img {
+      display: block;
+      width: 258px;
+      height: auto;
+    }
+
+    /* Shown when image src is empty or fails */
+    .component-placeholder {
+      width: 258px;
+      aspect-ratio: 3 / 4.2;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px dashed rgba(255,255,255,0.12);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 28px 20px;
+    }
+    .component-placeholder__emoji { font-size: 30px; opacity: 0.4; }
+    .component-placeholder__text {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: rgba(255,255,255,0.28);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .component-placeholder__code {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(45,212,191,0.55);
+    }
+
+    /* ── Footer status bar ── */
+    .split-footer {
+      height: 25px;
+      background: #0c1420;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 22px;
+      flex-shrink: 0;
+    }
+    .footer-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--sans);
+      font-size: 10px;
+      color: rgba(255,255,255,0.25);
+    }
+    .footer-chip__dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+    }
+    .footer-chip__dot--g { background: var(--green); box-shadow: 0 0 4px rgba(63,185,80,0.6); }
+    .footer-chip__dot--t { background: var(--teal); }
+    .footer-chip--right { margin-left: auto; color: rgba(255,255,255,0.14); }
+
+    /* ── Caption bottom ── */
+    .caption-bottom {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: rgba(255,255,255,0.18);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .caption-bottom code {
+      font-family: var(--mono);
+      font-size: 10px;
+      background: rgba(255,255,255,0.06);
+      padding: 1px 7px;
+      border-radius: 3px;
+      color: rgba(255,255,255,0.32);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 780px) {
+      html, body { padding: 24px 12px; }
+      .split-body { height: auto; flex-direction: column; }
+      .pane { min-height: 320px; }
+      .mcp-divider {
+        width: auto; height: 28px;
+        border-left: none; border-right: none;
+        border-top: 1px solid rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+      }
+      .mcp-divider__line {
+        top: 50%; bottom: auto;
+        left: 0; right: 0;
+        transform: translateY(-50%);
+        width: auto; height: 1px;
+        background: linear-gradient(to right, transparent, rgba(45,212,191,0.7), transparent);
+      }
+      .mcp-divider__dot { display: none; }
+      .mcp-badge { flex-direction: row; gap: 6px; }
+      .mcp-badge__label { writing-mode: horizontal-tb; transform: none; }
+      .mcp-badge__arrows { writing-mode: horizontal-tb; transform: none; }
+      .layers { display: none; }
+      .canvas::before, .canvas::after { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrapper">
+
+  <!-- Caption -->
+  <p class="caption">
+    <em>Claude Code</em> + <em>MCP Figma</em> · Diseño desde la terminal, resultado en el canvas
+  </p>
+
+  <!-- ════ SPLIT SCREEN ════ -->
+  <div class="split-screen">
+
+    <!-- Window title bar -->
+    <div class="titlebar">
+      <div class="titlebar__dots">
+        <span class="dot dot--r"></span>
+        <span class="dot dot--y"></span>
+        <span class="dot dot--g"></span>
+      </div>
+      <span class="titlebar__center">
+        <strong>Claude Code</strong> &nbsp;·&nbsp; MCP &nbsp;·&nbsp; <strong>Figma Desktop</strong> &nbsp;·&nbsp; Isla Nativa Travel
+      </span>
+      <span class="titlebar__badge">⚡ MCP conectado</span>
+    </div>
+
+    <!-- Body -->
+    <div class="split-body">
+
+      <!-- ════ LEFT: TERMINAL ════ -->
+      <div class="pane pane--terminal">
+
+        <div class="pane__bar">
+          <!-- Terminal icon -->
+          <svg class="pane__bar-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="2" width="14" height="12" rx="2"/>
+            <path d="M4 7l3 2.5L4 12M9 12h3"/>
+          </svg>
+          <span class="pane__bar-label"><strong>claude-code</strong> · figma-mcp · isla-nativa</span>
+          <span class="pane__bar-status">
+            <span class="live-dot"></span>
+            daemon activo
+          </span>
+        </div>
+
+        <div class="terminal-body">
+
+          <!-- Command block -->
+          <div class="cmd-block">
+            <span class="t-prompt"></span>
+            <span class="t-cmd">node src/index.js </span><span class="t-flag">render</span> <span class="t-angle">'</span><span class="t-angle">&lt;</span><span class="t-jsx">Frame</span>
+            <span class="ind1"><span class="t-attr">name</span>=<span class="t-val">"ExperienceCard/md"</span>  <span class="t-attr">w</span>=<span class="t-num">{360}</span></span>
+            <span class="ind1"><span class="t-attr">bg</span>=<span class="t-val">"var:card"</span>  <span class="t-attr">stroke</span>=<span class="t-val">"var:border"</span>  <span class="t-attr">rounded</span>=<span class="t-num">{16}</span></span>
+            <span class="ind1"><span class="t-attr">flex</span>=<span class="t-val">"col"</span>  <span class="t-attr">overflow</span>=<span class="t-val">"hidden"</span><span class="t-angle">&gt;</span></span>
+            <span class="ind2"><span class="t-angle">&lt;</span><span class="t-jsx">Frame</span> <span class="t-attr">name</span>=<span class="t-val">"_media"</span> <span class="t-attr">w</span>=<span class="t-val">"fill"</span> <span class="t-attr">h</span>=<span class="t-num">{220}</span><span class="t-angle">/&gt;</span></span>
+            <span class="ind2"><span class="t-angle">&lt;</span><span class="t-jsx">Frame</span> <span class="t-attr">name</span>=<span class="t-val">"_fal"</span> <span class="t-attr">h</span>=<span class="t-num">{48}</span> <span class="t-attr">flex</span>=<span class="t-val">"row"</span> <span class="t-attr">items</span>=<span class="t-val">"center"</span> <span class="t-attr">px</span>=<span class="t-num">{16}</span><span class="t-angle">&gt;</span></span>
+            <span class="ind3"><span class="t-angle">&lt;</span><span class="t-jsx">Text</span> <span class="t-attr">color</span>=<span class="t-val">"var:muted-foreground"</span> <span class="t-attr">w</span>=<span class="t-val">"fill"</span><span class="t-angle">/&gt;</span></span>
+            <span class="ind3"><span class="t-angle">&lt;</span><span class="t-jsx">Icon</span> <span class="t-attr">name</span>=<span class="t-val">"lucide:heart"</span> <span class="t-attr">size</span>=<span class="t-num">{20}</span><span class="t-angle">/&gt;</span></span>
+            <span class="ind2"><span class="t-angle">&lt;/</span><span class="t-jsx">Frame</span><span class="t-angle">&gt;</span></span>
+            <span class="ind2"><span class="t-angle">&lt;</span><span class="t-jsx">Frame</span> <span class="t-attr">name</span>=<span class="t-val">"_content"</span> <span class="t-attr">p</span>=<span class="t-num">{16}</span> <span class="t-attr">gap</span>=<span class="t-num">{12}</span> <span class="t-attr">flex</span>=<span class="t-val">"col"</span><span class="t-angle">&gt;</span></span>
+            <span class="ind3"><span class="t-angle">&lt;</span><span class="t-jsx">Text</span> <span class="t-attr">size</span>=<span class="t-num">{16}</span> <span class="t-attr">weight</span>=<span class="t-val">"bold"</span> <span class="t-attr">w</span>=<span class="t-val">"fill"</span><span class="t-angle">/&gt;</span></span>
+            <span class="ind3"><span class="t-angle">&lt;</span><span class="t-jsx">Text</span> <span class="t-attr">color</span>=<span class="t-val">"var:muted-foreground"</span> <span class="t-attr">size</span>=<span class="t-num">{13}</span> <span class="t-attr">w</span>=<span class="t-val">"fill"</span><span class="t-angle">/&gt;</span></span>
+            <span class="ind3"><span class="t-angle">&lt;</span><span class="t-jsx">Frame</span> <span class="t-attr">flex</span>=<span class="t-val">"row"</span> <span class="t-attr">items</span>=<span class="t-val">"center"</span> <span class="t-attr">w</span>=<span class="t-val">"fill"</span><span class="t-angle">&gt;</span></span>
+            <span class="ind4"><span class="t-angle">&lt;</span><span class="t-jsx">Text</span> <span class="t-attr">size</span>=<span class="t-num">{18}</span> <span class="t-attr">weight</span>=<span class="t-val">"bold"</span><span class="t-angle">&gt;</span>USD 45<span class="t-angle">&lt;/</span><span class="t-jsx">Text</span><span class="t-angle">&gt;</span></span>
+            <span class="ind4"><span class="t-angle">&lt;</span><span class="t-jsx">Frame</span> <span class="t-attr">grow</span>=<span class="t-num">{1}</span><span class="t-angle">/&gt;</span></span>
+            <span class="ind4"><span class="t-angle">&lt;</span><span class="t-jsx">Frame</span> <span class="t-attr">bg</span>=<span class="t-val">"var:primary"</span> <span class="t-attr">rounded</span>=<span class="t-num">{24}</span> <span class="t-attr">px</span>=<span class="t-num">{16}</span> <span class="t-attr">py</span>=<span class="t-num">{8}</span><span class="t-angle">&gt;</span></span>
+            <span class="ind4"><span class="t-angle">&nbsp;&nbsp;&lt;</span><span class="t-jsx">Text</span> <span class="t-attr">color</span>=<span class="t-val">"var:primary-foreground"</span><span class="t-angle">&gt;</span>Ver detalle<span class="t-angle">&lt;/</span><span class="t-jsx">Text</span><span class="t-angle">&gt;</span></span>
+            <span class="ind4"><span class="t-angle">&lt;/</span><span class="t-jsx">Frame</span><span class="t-angle">&gt;</span></span>
+            <span class="ind3"><span class="t-angle">&lt;/</span><span class="t-jsx">Frame</span><span class="t-angle">&gt;</span></span>
+            <span class="ind2"><span class="t-angle">&lt;/</span><span class="t-jsx">Frame</span><span class="t-angle">&gt;</span></span>
+            <span class="ind1"><span class="t-angle">&lt;/</span><span class="t-jsx">Frame</span><span class="t-angle">&gt;'</span></span>
+          </div>
+
+          <!-- Token resolution -->
+          <span class="out-section">  Resolving token aliases…</span>
+
+          <div class="out-row">
+            <span class="t-ok">  ✓</span>
+            <span class="t-dim">  var:card            </span>
+            <span class="t-dim"> → </span>
+            <span class="t-tok">color/bg/card        </span>
+            <span class="t-hex">#1a2f31</span>
+          </div>
+          <div class="out-row">
+            <span class="t-ok">  ✓</span>
+            <span class="t-dim">  var:border          </span>
+            <span class="t-dim"> → </span>
+            <span class="t-tok">color/border/subtle  </span>
+            <span class="t-hex">#2a4244</span>
+          </div>
+          <div class="out-row">
+            <span class="t-ok">  ✓</span>
+            <span class="t-dim">  var:foreground      </span>
+            <span class="t-dim"> → </span>
+            <span class="t-tok">color/text/primary   </span>
+            <span class="t-hex">#f0f5f5</span>
+          </div>
+          <div class="out-row">
+            <span class="t-ok">  ✓</span>
+            <span class="t-dim">  var:muted-foreground</span>
+            <span class="t-dim"> → </span>
+            <span class="t-tok">color/text/secondary </span>
+            <span class="t-hex">#8ba9ac</span>
+          </div>
+          <div class="out-row">
+            <span class="t-ok">  ✓</span>
+            <span class="t-dim">  var:primary         </span>
+            <span class="t-dim"> → </span>
+            <span class="t-tok">color/action/primary </span>
+            <span class="t-hex">#e58a72</span>
+          </div>
+          <div class="out-row">
+            <span class="t-ok">  ✓</span>
+            <span class="t-dim">  var:background      </span>
+            <span class="t-dim"> → </span>
+            <span class="t-tok">color/bg/surface     </span>
+            <span class="t-hex">#112729</span>
+          </div>
+
+          <!-- Frame tree -->
+          <span class="out-section">  Building frame tree…</span>
+
+          <div class="out-row tree">
+            <span class="t-ok">  ✓</span>
+            <span class="t-name">  ExperienceCard/md  </span>
+            <span class="t-dim">360×auto </span>
+            <span class="t-id">ID 847:91 </span>
+            <span class="t-info"></span>
+          </div>
+          <div class="out-row tree">
+            <span class="t-ok">  ✓</span>
+            <span class="t-name">    _media           </span>
+            <span class="t-dim">360×220  </span>
+            <span class="t-id">ID 847:92 </span>
+            <span class="t-info"></span>
+          </div>
+          <div class="out-row tree">
+            <span class="t-ok">  ✓</span>
+            <span class="t-name">    _fal             </span>
+            <span class="t-dim">360×48   </span>
+            <span class="t-id">ID 847:93 </span>
+            <span class="t-info">shadow applied</span>
+          </div>
+          <div class="out-row tree">
+            <span class="t-ok">  ✓</span>
+            <span class="t-name">      lucide:heart   </span>
+            <span class="t-dim">20×20    </span>
+            <span class="t-id">ID 847:94 </span>
+            <span class="t-info">SVG ↓ Iconify</span>
+          </div>
+          <div class="out-row tree">
+            <span class="t-ok">  ✓</span>
+            <span class="t-name">    _content         </span>
+            <span class="t-dim">360×auto </span>
+            <span class="t-id">ID 847:96 </span>
+            <span class="t-info"></span>
+          </div>
+          <div class="out-row tree">
+            <span class="t-ok">  ✓</span>
+            <span class="t-name">      _cta-row       </span>
+            <span class="t-dim">360×40   </span>
+            <span class="t-id">ID 847:99 </span>
+            <span class="t-info"></span>
+          </div>
+          <div class="out-row tree">
+            <span class="t-ok">  ✓</span>
+            <span class="t-name">        _btn         </span>
+            <span class="t-dim">auto×40  </span>
+            <span class="t-id">ID 847:102</span>
+            <span class="t-info"> rounded:24</span>
+          </div>
+
+          <br>
+          <div class="out-row">
+            <span class="t-dim"></span>
+            <span class="t-dim">  Binding vars…    </span>
+            <span class="t-dim"></span>
+            <span class="t-ok">14 bindings applied</span>
+          </div>
+          <div class="out-row">
+            <span class="t-dim"></span>
+            <span class="t-dim">  MCP → Figma…     </span>
+            <span class="t-dim"></span>
+            <span class="t-hex">reflecting…</span>
+          </div>
+          <br>
+          <span class="out-success">  ✓  node 847:91 · 13 children · 14 var bindings</span>
+          <span class="out-success">  ✓  Canvas x=1240 y=320 · visible in viewport</span>
+          <br>
+          <span class="t-dim">  ▸ <span class="t-cursor"></span></span>
+
+        </div><!-- /.terminal-body -->
+      </div><!-- /.pane--terminal -->
+
+      <!-- ════ MCP DIVIDER ════ -->
+      <div class="mcp-divider">
+        <div class="mcp-divider__line"></div>
+        <div class="mcp-divider__dot mcp-divider__dot--a"></div>
+        <div class="mcp-divider__dot mcp-divider__dot--b"></div>
+        <div class="mcp-badge">
+          <span class="mcp-badge__icon">⚡</span>
+          <span class="mcp-badge__label">MCP</span>
+          <span class="mcp-badge__arrows">↕</span>
+        </div>
+      </div>
+
+      <!-- ════ RIGHT: FIGMA ════ -->
+      <div class="pane pane--figma">
+
+        <div class="pane__bar">
+          <!-- Figma logo -->
+          <svg width="11" height="16" viewBox="0 0 22 32" style="flex-shrink:0;">
+            <path d="M11 0H6C2.69 0 0 2.69 0 6s2.69 6 6 6h5V0z" fill="#F24E1E"/>
+            <path d="M11 0h5c3.31 0 6 2.69 6 6s-2.69 6-6 6h-5V0z" fill="#FF7262"/>
+            <path d="M0 18c0-3.31 2.69-6 6-6h5v12H6c-3.31 0-6-2.69-6-6z" fill="#A259FF"/>
+            <path d="M22 18c0-3.31-2.69-6-6-6h-5v6c0 3.31 2.69 6 6 6s6-2.69 6-6z" fill="#1ABCFE"/>
+            <path d="M6 32c3.31 0 6-2.69 6-6v-6H6c-3.31 0-6 2.69-6 6s2.69 6 6 6z" fill="#0ACF83"/>
+          </svg>
+          <span class="pane__bar-label" style="margin-left:5px;"><strong>Figma Desktop</strong> · Isla Nativa Travel – AI Product Design</span>
+          <span class="pane__bar-status">
+            <span class="live-dot"></span>
+            live
+          </span>
+        </div>
+
+        <!-- Figma secondary toolbar -->
+        <div class="figma-toolbar">
+          <div class="ftool ftool--on" title="Move">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="currentColor">
+              <path d="M1 1l9 4.5-4.5 1L4 11 1 1z"/>
+            </svg>
+          </div>
+          <div class="ftool" title="Frame">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1">
+              <line x1="2" y1="0" x2="2" y2="2"/><line x1="8" y1="0" x2="8" y2="2"/>
+              <line x1="0" y1="2" x2="2" y2="2"/><line x1="8" y1="2" x2="10" y2="2"/>
+              <line x1="2" y1="8" x2="2" y2="10"/><line x1="8" y1="8" x2="8" y2="10"/>
+              <line x1="0" y1="8" x2="2" y2="8"/><line x1="8" y1="8" x2="10" y2="8"/>
+              <rect x="2" y="2" width="6" height="6" stroke-opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="ftool" title="Text" style="font-weight:500;font-family:var(--sans);">T</div>
+          <div class="fsep"></div>
+          <div class="ftool" title="Pen">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
+              <path d="M5 1L9 5L5 9L1 5Z"/>
+            </svg>
+          </div>
+          <div class="ftool" title="Hand">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
+              <path d="M4 9V4.5a.5.5 0 011 0V7m0-2.5a.5.5 0 011 0V7m0-2a.5.5 0 011 0v2.5c0 1.5-1 3-3 3S2 8.5 2 7V5.5a.5.5 0 011 0V7"/>
+            </svg>
+          </div>
+          <div class="fsep"></div>
+          <div class="ftoolbar__right">100%</div>
+        </div>
+
+        <!-- Inner: layers + canvas -->
+        <div class="figma-body">
+
+          <!-- Layers panel -->
+          <div class="layers">
+            <div class="layers__header">Layers</div>
+
+            <!-- Component (selected) -->
+            <div class="layer-row layer-row--comp layer-row--sel" style="margin-top:3px;">
+              <span class="layer-row__caret">▾</span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1L11 6L6 11L1 6Z" class="ico-comp" stroke-width="1.1"/></svg>
+              </span>
+              <span class="layer-row__name">ExperienceCard/md</span>
+            </div>
+
+            <div class="layer-row" style="margin-left:0;">
+              <div style="width:14px;flex-shrink:0;"></div>
+              <span class="layer-row__caret">▾</span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" class="ico-frame" stroke-width="1.1"/></svg>
+              </span>
+              <span class="layer-row__name">_media</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:14px;flex-shrink:0;"></div>
+              <span class="layer-row__caret">▾</span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" class="ico-frame" stroke-width="1.1"/></svg>
+              </span>
+              <span class="layer-row__name">_fal</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:28px;flex-shrink:0;"></div>
+              <span class="layer-row__caret" style="opacity:0;"> </span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4h8M6 4v5M4 9h4" class="ico-text" stroke-width="1.1" stroke-linecap="round"/></svg>
+              </span>
+              <span class="layer-row__name">Kayak al atardecer</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:28px;flex-shrink:0;"></div>
+              <span class="layer-row__caret" style="opacity:0;"> </span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1L11 6L6 11L1 6Z" class="ico-inst" stroke-width="1.1"/></svg>
+              </span>
+              <span class="layer-row__name" style="color:#818cf8;">lucide:heart</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:14px;flex-shrink:0;"></div>
+              <span class="layer-row__caret">▾</span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" class="ico-frame" stroke-width="1.1"/></svg>
+              </span>
+              <span class="layer-row__name">_content</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:28px;flex-shrink:0;"></div>
+              <span class="layer-row__caret" style="opacity:0;"> </span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4h8M6 4v5M4 9h4" class="ico-text" stroke-width="1.1" stroke-linecap="round"/></svg>
+              </span>
+              <span class="layer-row__name">Kayak en la Lagoa…</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:28px;flex-shrink:0;"></div>
+              <span class="layer-row__caret" style="opacity:0;"> </span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4h8M6 4v5M4 9h4" class="ico-text" stroke-width="1.1" stroke-linecap="round"/></svg>
+              </span>
+              <span class="layer-row__name">Florianópolis · 2h…</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:28px;flex-shrink:0;"></div>
+              <span class="layer-row__caret">▾</span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" class="ico-frame" stroke-width="1.1"/></svg>
+              </span>
+              <span class="layer-row__name">_cta-row</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:42px;flex-shrink:0;"></div>
+              <span class="layer-row__caret" style="opacity:0;"> </span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4h8M6 4v5M4 9h4" class="ico-text" stroke-width="1.1" stroke-linecap="round"/></svg>
+              </span>
+              <span class="layer-row__name">USD 45</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:42px;flex-shrink:0;"></div>
+              <span class="layer-row__caret">▾</span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" class="ico-frame" stroke-width="1.1"/></svg>
+              </span>
+              <span class="layer-row__name">_btn</span>
+            </div>
+
+            <div class="layer-row">
+              <div style="width:56px;flex-shrink:0;"></div>
+              <span class="layer-row__caret" style="opacity:0;"> </span>
+              <span class="layer-row__ico">
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4h8M6 4v5M4 9h4" class="ico-text" stroke-width="1.1" stroke-linecap="round"/></svg>
+              </span>
+              <span class="layer-row__name">Ver detalle</span>
+            </div>
+
+          </div><!-- /.layers -->
+
+          <!-- Canvas -->
+          <div class="canvas">
+            <div class="canvas__vignette"></div>
+
+            <!-- Selection with label -->
+            <div class="canvas__selection">
+              <span class="canvas__label">ExperienceCard/md</span>
+
+              <div class="canvas__frame">
+                <!-- Resize handles -->
+                <div class="handle h-tl"></div>
+                <div class="handle h-tr"></div>
+                <div class="handle h-bl"></div>
+                <div class="handle h-br"></div>
+                <div class="handle h-tm"></div>
+                <div class="handle h-bm"></div>
+                <div class="handle h-ml"></div>
+                <div class="handle h-mr"></div>
+
+                <!-- Dimension label -->
+                <div class="canvas__dims">360 × 504</div>
+
+                <!--
+                  ╔══════════════════════════════════════╗
+                  ║  REEMPLAZA src="" con tu screenshot  ║
+                  ║  del componente ExperienceCard.      ║
+                  ║  Ancho recomendado: 258px en canvas. ║
+                  ╚══════════════════════════════════════╝
+                -->
+                <img
+                  class="component-img"
+                  src=""
+                  alt="ExperienceCard/md · Isla Nativa Travel"
+                  id="comp-img"
+                />
+
+                <!-- Fallback placeholder -->
+                <div class="component-placeholder" id="comp-placeholder">
+                  <div class="component-placeholder__emoji">🎨</div>
+                  <div class="component-placeholder__text">
+                    Inserta tu captura<br/>del componente aquí
+                  </div>
+                  <div class="component-placeholder__code">ExperienceCard/md</div>
+                </div>
+
+              </div><!-- /.canvas__frame -->
+            </div><!-- /.canvas__selection -->
+
+          </div><!-- /.canvas -->
+
+        </div><!-- /.figma-body -->
+      </div><!-- /.pane--figma -->
+
+    </div><!-- /.split-body -->
+
+    <!-- Footer status bar -->
+    <div class="split-footer">
+      <span class="footer-chip">
+        <span class="footer-chip__dot footer-chip__dot--g"></span>
+        MCP conectado · Figma Desktop
+      </span>
+      <span class="footer-chip">
+        <span class="footer-chip__dot footer-chip__dot--t"></span>
+        14 var bindings · node 847:91
+      </span>
+      <span class="footer-chip footer-chip--right">
+        Isla Nativa Travel · AI Product Design · 2026
+      </span>
+    </div>
+
+  </div><!-- /.split-screen -->
+
+  <!-- Caption bottom -->
+  <p class="caption-bottom">
+    Un comando <code>render '&lt;Frame bg="var:card"…'</code> en la terminal.
+    El resultado, en Figma en tiempo real, con 14 variables bindeadas.
+  </p>
+
+</div><!-- /.wrapper -->
+
+<script>
+  // Show placeholder if image src is empty or broken
+  (function () {
+    var img = document.getElementById('comp-img');
+    var ph  = document.getElementById('comp-placeholder');
+
+    function checkImg() {
+      if (!img.src || img.src === window.location.href || img.naturalWidth === 0) {
+        img.style.display = 'none';
+        ph.style.display  = 'flex';
+      } else {
+        img.style.display = 'block';
+        ph.style.display  = 'none';
+      }
+    }
+
+    img.addEventListener('load',  checkImg);
+    img.addEventListener('error', checkImg);
+    // Run immediately in case src is already empty
+    checkImg();
+  })();
+</script>
+
+</body>
+</html>

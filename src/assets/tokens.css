@@ -1,0 +1,246 @@
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* ── Colores primitivos — Ocean ── */
+  --color-ocean-50:  #f0f9ff;
+  --color-ocean-100: #e0f2fe;
+  --color-ocean-300: #7dd3fc;
+  --color-ocean-400: #38bdf8;
+  --color-ocean-500: #0ea5e9;
+  --color-ocean-700: #0369a1;
+  --color-ocean-800: #075985;
+
+  /* Turquoise */
+  --color-turquoise-50:  #f4fafb;
+  --color-turquoise-100: #e3f3f5;
+  --color-turquoise-200: #c7e6ea;
+  --color-turquoise-300: #90cfd3;
+  --color-turquoise-500: #4aa6ad;
+  --color-turquoise-600: #36858c;
+  --color-turquoise-700: #27656b;
+  --color-turquoise-800: #1b4a4f;
+  --color-turquoise-900: #103033;
+
+  /* Coral */
+  --color-coral-300: #edaf9f;
+  --color-coral-400: #e79786;
+  --color-coral-500: #e58a72;
+  --color-coral-600: #cf7b65;
+  --color-coral-700: #b86a57;
+
+  /* Yellow */
+  --color-yellow-50:  #fffbeb;
+  --color-yellow-400: #fbbf24;
+  --color-yellow-500: #f59e0b;
+  --color-yellow-600: #d97706;
+
+  /* Neutral */
+  --color-neutral-50:  #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #f0f0f0;
+  --color-neutral-300: #e5e5e5;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-800: #262626;
+
+  /* ── Colores semánticos — Fondos ── */
+  --color-bg-surface:           #f5f5f5;
+  --color-bg-card:              #fafafa;
+  --color-bg-subtle:            #f0f0f0;
+  --color-bg-disabled:          #e5e5e5;
+  --color-bg-interactive-hover: #e3f3f5;
+  --color-surface-dark:         #103033;
+  --color-surface-mid:          #1b4a4f;
+
+  /* Texto */
+  --color-text-primary:      #262626;
+  --color-text-secondary:    #525252;
+  --color-text-muted:        #737373;
+  --color-text-inverse:      #fafafa;
+  --color-text-on-primary:   #fafafa;
+  --color-text-on-secondary: #103033;
+  --color-text-brand:        #e58a72;
+  --color-text-placeholder:  #a3a3a3;
+  --color-text-disabled:     #a3a3a3;
+
+  /* Acciones */
+  --color-action-primary-base:   #0ea5e9;
+  --color-action-primary-hover:  #0369a1;
+  --color-action-primary-active: #075985;
+  --color-action-secondary-base: #36858c;
+  --color-action-tertiary-base:  #e58a72;
+
+  /* Bordes */
+  --color-border-default: #e5e5e5;
+  --color-border-subtle:  #f0f0f0;
+  --color-border-focus:   #0ea5e9;
+  --color-border-error:   #edaf9f;
+
+  /* ── Tipografía ── */
+  --font-family-base: 'Inter', sans-serif;
+
+  --font-size-display: 48px;
+  --font-size-h1:      36px;
+  --font-size-h2:      28px;
+  --font-size-h3:      22px;
+  --font-size-h4:      20px;
+  --font-size-body-lg: 17px;
+  --font-size-body:    15px;
+  --font-size-body-sm: 13px;
+  --font-size-strong:  14px;
+  --font-size-label:   13px;
+  --font-size-caption: 11px;
+  --font-size-helper:  12px;
+  --font-size-card-title: 15px;
+  --font-size-card-price: 18px;
+
+  --font-weight-regular:   400;
+  --font-weight-medium:    500;
+  --font-weight-semibold:  600;
+  --font-weight-bold:      700;
+
+  --line-height-display: 53px;
+  --line-height-h1:      43px;
+  --line-height-h2:      35px;
+  --line-height-h3:      29px;
+  --line-height-h4:      28px;
+  --line-height-body-lg: 26px;
+  --line-height-body:    23px;
+  --line-height-strong:  20px;
+  --line-height-body-sm: 20px;
+  --line-height-label:   18px;
+  --line-height-caption: 15px;
+  --line-height-helper:  16px;
+
+  /* ── Espaciado ── */
+  --spacing-2:  2px;
+  --spacing-4:  4px;
+  --spacing-6:  6px;
+  --spacing-8:  8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-56: 56px;
+  --spacing-64: 64px;
+  --spacing-96: 96px;
+
+  /* ── Border radius ── */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-pill: 999px;
+
+  /* ── Tipografía mono ── */
+  --font-family-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  font-family: var(--font-family-base);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Animaciones de entrada ── */
+
+/* Fade + slide desde abajo */
+.anim-fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-fade-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fade puro */
+.anim-fade-in {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.anim-fade-in.is-visible { opacity: 1; }
+
+/* Scale + fade */
+.anim-scale-up {
+  opacity: 0;
+  transform: scale(0.92) translateY(16px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-scale-up.is-visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Blur + fade (para elementos destacados) */
+.anim-blur-in {
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(1.04);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-blur-in.is-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+
+/* Slide desde izquierda */
+.anim-slide-left {
+  opacity: 0;
+  transform: translateX(-48px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-slide-left.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide desde derecha */
+.anim-slide-right {
+  opacity: 0;
+  transform: translateX(48px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-slide-right.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Stagger helpers — 120ms por paso */
+.anim-delay-1  { transition-delay: 0.12s !important; }
+.anim-delay-2  { transition-delay: 0.24s !important; }
+.anim-delay-3  { transition-delay: 0.36s !important; }
+.anim-delay-4  { transition-delay: 0.48s !important; }
+.anim-delay-5  { transition-delay: 0.60s !important; }
+.anim-delay-6  { transition-delay: 0.72s !important; }
+.anim-delay-7  { transition-delay: 0.84s !important; }
+.anim-delay-8  { transition-delay: 0.96s !important; }
+
+/* Respeta preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-fade-in,
+  .anim-scale-up,
+  .anim-blur-in,
+  .anim-slide-left,
+  .anim-slide-right {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
