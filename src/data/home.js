@@ -10,7 +10,7 @@ export const categories = [
 export const experiences = [
   {
     id: 1,
-    image: '/src/assets/IMG/image-card01.png',
+    image: '/IMG/image-card01.png',
     badge:       { es: 'Destacado',  pt: 'Destaque'   },
     tag:         { es: 'Outdoor',    pt: 'Outdoor'    },
     title:       { es: 'Surf en Praia da Joaquina',         pt: 'Surf na Praia da Joaquina'          },
@@ -19,7 +19,7 @@ export const experiences = [
   },
   {
     id: 2,
-    image: '/src/assets/IMG/image-card02.png',
+    image: '/IMG/image-card02.png',
     badge:       { es: 'Nuevo',      pt: 'Novo'       },
     tag:         { es: 'Wellness',   pt: 'Wellness'   },
     title:       { es: 'Yoga al amanecer en la playa',      pt: 'Yoga ao amanhecer na praia'         },
@@ -28,7 +28,7 @@ export const experiences = [
   },
   {
     id: 3,
-    image: '/src/assets/IMG/image-card03.png',
+    image: '/IMG/image-card03.png',
     badge: null,
     tag:         { es: 'Aventura',   pt: 'Aventura'   },
     title:       { es: 'Kayak por la Lagoa do Peri',        pt: 'Caiaque pela Lagoa do Peri'         },
@@ -37,7 +37,7 @@ export const experiences = [
   },
   {
     id: 4,
-    image: '/src/assets/IMG/image-card04.png',
+    image: '/IMG/image-card04.png',
     badge:       { es: 'Popular',    pt: 'Popular'    },
     tag:         { es: 'Aventura',   pt: 'Aventura'   },
     title:       { es: 'Trekking Morro da Cruz',            pt: 'Trekking Morro da Cruz'             },
@@ -46,7 +46,7 @@ export const experiences = [
   },
   {
     id: 5,
-    image: '/src/assets/IMG/image-card05.png',
+    image: '/IMG/image-card05.png',
     badge: null,
     tag:         { es: 'Gastronomía', pt: 'Gastronomia' },
     title:       { es: 'Tour por el mercado',               pt: 'Tour pelo mercado'                  },
@@ -55,7 +55,7 @@ export const experiences = [
   },
   {
     id: 6,
-    image: '/src/assets/IMG/image-card06.png',
+    image: '/IMG/image-card06.png',
     badge:       { es: 'Nuevo',      pt: 'Novo'       },
     tag:         { es: 'Outdoor',    pt: 'Outdoor'    },
     title:       { es: 'Stand Up Paddle en Lagoa',          pt: 'Stand Up Paddle na Lagoa'           },
@@ -91,7 +91,7 @@ export const testimonial = {
   quote:  { es: 'El tour de kayak fue absolutamente mágico. Nuestro guía conocía cada rincón secreto de la laguna. Una experiencia que jamás olvidaré.', pt: 'O passeio de caiaque foi absolutamente mágico. Nosso guia conhecia cada cantinho secreto da lagoa. Uma experiência que jamais esquecerei.' },
   author: 'María González',
   role:   { es: 'Viajera · Buenos Aires', pt: 'Viajante · Buenos Aires' },
-  avatar: '/src/assets/IMG/_avatar.png',
+  avatar: '/IMG/_avatar.png',
   rating: 5,
   stats:  { es: '⭐ 4.8 promedio · +5.000 experiencias', pt: '⭐ 4.8 média · +5.000 experiências' },
 }
