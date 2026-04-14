@@ -21,7 +21,7 @@
           <div class="modal__meta">
             <Star :size="13" class="modal__star" fill="currentColor" />
             <span class="modal__rating">{{ exp.rating }}</span>
-            <span class="modal__reviews">({{ exp.reviews }} {{ isEs ? 'reseñas' : 'avaliações' }})</span>
+            <span class="modal__reviews">({{ exp.reviews }} {{ t.reviews }})</span>
             <span class="modal__sep">·</span>
             <Clock :size="13" />
             <span>{{ exp.duration }}</span>
@@ -34,19 +34,16 @@
           <p class="modal__desc">{{ exp.description[locale] }}</p>
 
           <ul class="modal__details">
-            <li>✅ {{ isEs ? 'Guía local certificado incluido' : 'Guia local certificado incluído' }}</li>
-            <li>🎒 {{ isEs ? 'Equipamiento provisto' : 'Equipamento fornecido' }}</li>
-            <li>🔄 {{ isEs ? 'Cancelación gratuita hasta 24h antes' : 'Cancelamento gratuito até 24h antes' }}</li>
-            <li>📍 {{ isEs ? 'Punto de encuentro confirmado al reservar' : 'Ponto de encontro confirmado ao reservar' }}</li>
+            <li v-for="(item, i) in exp.details[locale]" :key="i">{{ item }}</li>
           </ul>
 
           <div class="modal__footer">
             <div class="modal__price-row">
               <span class="modal__price">{{ exp.price }}</span>
-              <span class="modal__per">{{ isEs ? '/persona' : '/pessoa' }}</span>
+              <span class="modal__per">{{ t.perPerson }}</span>
             </div>
             <AppButton variant="primary" size="lg" @click="$emit('reserve')">
-              {{ isEs ? 'Reservar ahora →' : 'Reservar agora →' }}
+              {{ t.cta }}
             </AppButton>
           </div>
         </div>
@@ -72,13 +69,9 @@ const { locale } = useLocale()
 const t = computed(() => {
   const es = locale.value === 'es'
   return {
-    reviews:    es ? 'reseñas'                              : 'avaliações',
-    detail1:    es ? 'Guía local certificado incluido'      : 'Guia local certificado incluído',
-    detail2:    es ? 'Equipamiento provisto'                : 'Equipamento fornecido',
-    detail3:    es ? 'Cancelación gratuita hasta 24h antes' : 'Cancelamento gratuito até 24h antes',
-    detail4:    es ? 'Punto de encuentro confirmado al reservar' : 'Ponto de encontro confirmado ao reservar',
-    perPerson:  es ? '/persona'                             : '/pessoa',
-    cta:        es ? 'Reservar ahora →'                     : 'Reservar agora →',
+    reviews:   es ? 'reseñas'         : 'avaliações',
+    perPerson: es ? '/persona'        : '/pessoa',
+    cta:       es ? 'Reservar ahora →' : 'Reservar agora →',
   }
 })
 </script>
