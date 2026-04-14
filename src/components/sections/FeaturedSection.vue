@@ -10,7 +10,7 @@
       <!-- Grid -->
       <div class="featured__grid">
         <ExperienceCard
-          v-for="(exp, i) in experiences"
+          v-for="(exp, i) in pageItems"
           :key="exp.id"
           :class="['anim-scale-up', `anim-delay-${i + 1}`, { 'is-visible': visible }]"
           :image="exp.image"
@@ -25,34 +25,71 @@
           :price="exp.price"
           :saved="saved.includes(exp.id)"
           @save="toggleSave(exp.id)"
+          @detail="openModal(exp)"
         />
       </div>
 
       <!-- Pagination -->
       <div class="featured__pagination">
-        <PaginationBar :total="3" :current="page" @change="page = $event" />
+        <PaginationBar :total="totalPages" :current="page" @change="changePage" />
       </div>
     </div>
+
+    <!-- Modal -->
+    <ExperienceModal
+      v-if="selected"
+      :exp="selected"
+      @close="selected = null"
+      @reserve="() => { selected = null; $router.push('/reservar') }"
+    />
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import ExperienceCard from '@/components/base/ExperienceCard.vue'
+import ExperienceModal from '@/components/base/ExperienceModal.vue'
 import PaginationBar from '@/components/base/PaginationBar.vue'
 import { experiences } from '@/data/home.js'
 import { useLocale } from '@/composables/useLocale.js'
 import { useInView } from '@/composables/useInView.js'
+import { useFilter } from '@/composables/useFilter.js'
 
 const { locale } = useLocale()
 const { el, visible } = useInView()
+const { activeCategory } = useFilter()
 
-const page   = ref(1)
-const saved  = ref([])
+const PER_PAGE = 6
+const page     = ref(1)
+const saved    = ref([])
+const selected = ref(null)
+
+const filtered   = computed(() =>
+  activeCategory.value
+    ? experiences.filter(e => e.tag.es === activeCategory.value)
+    : experiences
+)
+const totalPages = computed(() => Math.ceil(filtered.value.length / PER_PAGE))
+const pageItems  = computed(() => {
+  const start = (page.value - 1) * PER_PAGE
+  return filtered.value.slice(start, start + PER_PAGE)
+})
+
+// reset página al cambiar filtro
+watch(activeCategory, () => { page.value = 1 })
+
+function changePage(p) {
+  page.value = p
+  document.querySelector('.featured')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 function toggleSave(id) {
   const idx = saved.value.indexOf(id)
   idx === -1 ? saved.value.push(id) : saved.value.splice(idx, 1)
+}
+
+function openModal(exp) {
+  selected.value = exp
 }
 </script>
 

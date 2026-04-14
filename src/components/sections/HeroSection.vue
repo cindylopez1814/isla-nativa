@@ -1,6 +1,6 @@
 <template>
   <section class="hero">
-    <img src="/src/assets/IMG/hero.png" alt="Isla Nativa" class="hero__bg" />
+    <img src="/IMG/hero.png" alt="Isla Nativa" class="hero__bg" />
     <div class="hero__overlay" />
 
     <div class="hero__content">
@@ -93,7 +93,7 @@ const t = computed(() => i18n[locale.value])
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-4);
+  gap: 0;
 }
 
 .hero__line {
@@ -157,17 +157,26 @@ const t = computed(() => i18n[locale.value])
 @media (max-width: 768px) {
   .hero { min-height: 560px; }
   .hero__content { padding: var(--spacing-64) var(--spacing-24); }
-  .hero__line { font-size: var(--font-size-h1); }
+  .hero__line { font-size: var(--font-size-h1); letter-spacing: -1px; }
   .hero__emphasis { font-size: calc(var(--font-size-h1) * 1.1); }
   .hero__subtitle { font-size: var(--font-size-body); }
-  .hero__search { flex-direction: column; border-radius: var(--radius-lg); }
-  .hero__search-input { width: 100%; }
+  .hero__search {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    gap: var(--spacing-8);
+  }
+  .hero__search-input { padding: 0 var(--spacing-8); min-width: 0; }
+  .hero__input { font-size: var(--font-size-body-sm); min-width: 0; }
 }
 
 @media (max-width: 480px) {
   .hero { min-height: 480px; }
-  .hero__content { padding: var(--spacing-48) var(--spacing-16); gap: var(--spacing-24); }
-  .hero__line { font-size: var(--font-size-h2); }
+  .hero__content { padding: var(--spacing-48) var(--spacing-16); gap: var(--spacing-20); }
+  .hero__line { font-size: var(--font-size-h2); letter-spacing: -0.5px; }
   .hero__emphasis { font-size: calc(var(--font-size-h2) * 1.1); }
+  .hero__search { gap: var(--spacing-6); padding: var(--spacing-4); }
+  .hero__input { font-size: 13px; }
 }
 </style>

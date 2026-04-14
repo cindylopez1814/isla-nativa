@@ -39,7 +39,7 @@
         <span class="navbar__lang-sep">/</span>
         <span :class="['navbar__lang-opt', { active: isPt }]">PT</span>
       </div>
-      <AppButton variant="primary" size="md" style="width:100%" @click="router.push('/reservar')">{{ isEs ? 'Reservar' : 'Reservar' }}</AppButton>
+      <AppButton variant="primary" size="md" style="width:100%" @click="() => { router.push('/reservar'); open = false }">{{ isEs ? 'Reservar' : 'Reservar' }}</AppButton>
     </div>
   </nav>
 </template>
@@ -64,14 +64,13 @@ const { isEs, isPt, toggle: toggleLocale } = useLocale()
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border-subtle);
-  height: 91px;
 }
 
 .navbar__inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 var(--spacing-48);
-  height: 100%;
+  padding: var(--spacing-12) var(--spacing-48);
+  min-height: 64px;
   display: flex;
   align-items: center;
   gap: var(--spacing-40);
@@ -120,7 +119,7 @@ const { isEs, isPt, toggle: toggleLocale } = useLocale()
   border: none;
   color: var(--color-text-primary);
   cursor: pointer;
-  margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* Mobile menu */
@@ -177,8 +176,7 @@ const { isEs, isPt, toggle: toggleLocale } = useLocale()
 }
 
 @media (max-width: 768px) {
-  .navbar { height: auto; min-height: 64px; }
-  .navbar__inner { padding: 0 var(--spacing-24); }
+  .navbar__inner { padding: var(--spacing-12) var(--spacing-24); }
   .navbar__actions { display: none; }
   .navbar__hamburger { display: flex; }
 }

@@ -38,7 +38,7 @@
           <span class="card__price">{{ price }}</span>
           <span class="card__price-label">{{ perPerson }}</span>
         </div>
-        <button class="card__cta">{{ ctaLabel }}</button>
+        <button class="card__cta" @click="$emit('detail')">{{ ctaLabel }}</button>
       </div>
     </div>
   </article>
@@ -69,7 +69,7 @@ defineProps({
   saved:       { type: Boolean, default: false },
   size:        { type: String,  default: 'md' }, // sm | md | lg
 })
-defineEmits(['save'])
+defineEmits(['save', 'detail'])
 </script>
 
 <style scoped>
