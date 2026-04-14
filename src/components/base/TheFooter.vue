@@ -6,7 +6,7 @@
       <span class="footer__tagline">{{ locale === 'es' ? 'Hecho con ❤️ en la isla' : 'Feito com ❤️ na ilha' }}</span>
     </div>
     <div class="footer__built">
-      <span class="footer__built-text">BUILT BY <span class="footer__built-link">CALO LAB</span></span>
+      <span class="footer__built-text">BUILT BY <a href="https://calolab.cl" target="_blank" rel="noopener" class="footer__built-link">CALO LAB</a></span>
     </div>
   </footer>
 </template>
@@ -68,7 +68,10 @@ const { locale } = useLocale()
 .footer__built-link {
   font-family: var(--font-family-mono);
   color: rgba(255,255,255,0.2);
+  text-decoration: none;
+  transition: color 0.2s;
 }
+.footer__built-link:hover { color: var(--color-coral-400); }
 
 @media (max-width: 768px) {
   .footer__inner {
